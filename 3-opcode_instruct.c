@@ -1,149 +1,33 @@
 #include "monty.h"
-
 /**
- * _div - divides the second element by the top element of the stack
- *
- * @doubly: head of the linked list
- * @cline: line number;
- * Return: no return
+ *split_line - parse file into a list of arguments
+ *@line - pointer to the line to be tokenized
+ *Return: returns a pointer to the first token found in the string
  */
-void _div(stack_t **doubly, unsigned int cline)
+
+char **split_line(char *line)
 {
-	int m = 0;
-	stack_t *aux = NULL;
+	int bufsize = _TOK_DELIM;
+	int position = 0;
+	char **tokens = NULL;
+	char **tmp = NULL;
+	char *token;
 
-	aux = *doubly;
+	token = strtok(line, _TOK_DELIM);
 
-	for (; aux != NULL; aux = aux->next, m++)
-		;
-
-	if (m < 2)
+	while (token != NULL)
 	{
-		dprintf(2, "L%u: can't div, stack too short\n", cline);
-		free_vglo();
-		exit(EXIT_FAILURE);
+		tmp = realloc(tokens, sizeof(char *) * (position + 2));
+		if (tmp == NULL)
+		{
+			fprintf(stderr, "sh: allocation error\n");
+			exit(EXIT_FAILURE);
+		}
+		tokens = tmp;
+		tokens[position] = token;
+		token = strtok(NULL, _TOK_DELIM);
+		position++;
 	}
-
-	if ((*doubly)->n == 0)
-	{
-		dprintf(2, "L%u: division by zero\n", cline);
-		free_vglo();
-		exit(EXIT_FAILURE);
-	}
-
-	aux = (*doubly)->next;
-	aux->n /= (*doubly)->n;
-	_pop(doubly, cline);
-}
-
-/**
- * _mul - multiplies the top element to the next  element of the stack
- *
- * @doubly: head of the linked list
- * @cline: line number;
- * Return: no return
- */
-void _mul(stack_t **doubly, unsigned int cline)
-{
-	int m = 0;
-	stack_t *aux = NULL;
-
-	aux = *doubly;
-
-	for (; aux != NULL; aux = aux->next, m++)
-		;
-
-	if (m < 2)
-	{
-		dprintf(2, "L%u: can't mul, stack too short\n", cline);
-		free_vglo();
-		exit(EXIT_FAILURE);
-	}
-
-	aux = (*doubly)->next;
-	aux->n *= (*doubly)->n;
-	_pop(doubly, cline);
-}
-
-/**
- * _mod - computes the rest of the division of the second element
- * by the top element of the stack
- *
- * @doubly: head of the linked list
- * @cline: line number;
- * Return: no return
- */
-void _mod(stack_t **doubly, unsigned int cline)
-{
-	int m = 0;
-	stack_t *aux = NULL;
-
-	aux = *doubly;
-
-	for (; aux != NULL; aux = aux->next, m++)
-		;
-
-	if (m < 2)
-	{
-		dprintf(2, "L%u: can't mod, stack too short\n", cline);
-		free_vglo();
-		exit(EXIT_FAILURE);
-	}
-
-	if ((*doubly)->n == 0)
-	{
-		dprintf(2, "L%u: division by zero\n", cline);
-		free_vglo();
-		exit(EXIT_FAILURE);
-	}
-
-	aux = (*doubly)->next;
-	aux->n %= (*doubly)->n;
-	_pop(doubly, cline);
-}
-/**
- * _pchar - script to print the char value of the first element
- *
- * @doubly: head of the linked list
- * @cline: line number;
- * Return: no return
- */
-void _pchar(stack_t **doubly, unsigned int cline)
-{
-	if (doubly == NULL || *doubly == NULL)
-	{
-		dprintf(2, "L%u: can't pchar, stack empty\n", cline);
-		free_vglo();
-		exit(EXIT_FAILURE);
-	}
-	if ((*doubly)->n < 0 || (*doubly)->n >= 128)
-	{
-		dprintf(2, "L%u: can't pchar, value out of range\n", cline);
-		free_vglo();
-		exit(EXIT_FAILURE);
-	}
-	printf("%c\n", (*doubly)->n);
-}
-
-/**
- * _pstr - fuction that prints the string of the stack
- *
- * @doubly: head of the linked list
- * @cline: line number;
- * Return: no return
- */
-void _pstr(stack_t **doubly, unsigned int cline)
-{
-	stack_t *aux;
-	(void)cline;
-
-	aux = *doubly;
-
-	while (aux && aux->n > 0 && aux->n < 128)
-	{
-		printf("%c", aux->n);
-		aux = aux->next;
-	}
-
-	printf("\n");
+	tokens[position] = NULL;
+	return (tokens);
 }

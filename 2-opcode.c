@@ -1,102 +1,80 @@
 #include "monty.h"
 
 /**
- * _queue - sets the format of the data to a queue (FIFO)
- *
- * @doubly: head of the linked list
- * @cline: line number;
- * Return: no return
+ * op_push - adds elements to a stack
+ * @stack: pointer to the first node/element in a stack
+ * @line_number: the line within the stuck
+ * Return: nothing
  */
-void _queue(stack_t **doubly, unsigned int cline)
+void op_push(stack_t **stack, unsigned int line_number)
 {
-	(void)doubly;
-	(void)cline;
+	stack_t *new;
+	int n;
 
-	vglo.lifo = 0;
-}
-
-/**
- * _stack - sets the format fo the data to a stack (LIFO)
- *
- * @doubly: head of the linked list
- * @cline: line number;
- * Return: no return
- */
-void _stack(stack_t **doubly, unsigned int cline)
-{
-	(void)doubly;
-	(void)cline;
-
-	vglo.lifo = 1;
-}
-
-/**
- * _add - adds the top two elements of the stack
- *
- * @doubly: head of the linked list
- * @cline: line number;
- * Return: no return
- */
-void _add(stack_t **doubly, unsigned int cline)
-{
-	int m = 0;
-	stack_t *aux = NULL;
-
-	aux = *doubly;
-
-	for (; aux != NULL; aux = aux->next, m++)
-		;
-
-	if (m < 2)
+	if (stack == NULL)
 	{
-		dprintf(2, "L%u: can't add, stack too short\n", cline);
-		free_vglo();
+		fprintf(stderr, "L%d: stack not found\n", line_number);
 		exit(EXIT_FAILURE);
 	}
 
-	aux = (*doubly)->next;
-	aux->n += (*doubly)->n;
-	_pop(doubly, cline);
-}
-
-/**
- * _nop - doesn't do anythinhg
- *
- * @doubly: head of the linked list
- * @cline: line number;
- * Return: no return
- */
-void _nop(stack_t **doubly, unsigned int cline)
-{
-	(void)doubly;
-	(void)cline;
-}
-
-/**
- * _sub - subtracts the top element to the second top element of the stack
- *
- * @doubly: head of the linked list
- * @cline: line number;
- * Return: no return
- */
-void _sub(stack_t **doubly, unsigned int cline)
-{
-	int m = 0;
-	stack_t *aux = NULL;
-
-	aux = *doubly;
-
-	for (; aux != NULL; aux = aux->next, m++)
-		;
-
-	if (m < 2)
+	if (operand == NULL || _atoi(operand, &n) == -1)
 	{
-		dprintf(2, "L%u: can't sub, stack too short\n", cline);
-		free_vglo();
+		fprintf(stderr, "L%d: usage: push integer\n", line_number);
 		exit(EXIT_FAILURE);
 	}
 
-	aux = (*doubly)->next;
-	aux->n -= (*doubly)->n;
-	_pop(doubly, cline);
+	new = malloc(sizeof(stack_t));
+
+	if (new == NULL)
+	{
+		fprintf(stderr, "Error: malloc failed\n");
+		free(*stack);
+		exit(EXIT_FAILURE);
+	}
+
+	new->next = *stack;
+	new->prev = NULL;
+	new->n = n;
+
+	if (*stack)
+		(*stack)->prev = new;
+	*stack = new;
+}
+
+/**
+ *op_pall - prints the data of all nodes in a stack
+ *@stack: pointer to the head node pointer
+ *@line_number: the line number
+ *Return: void
+ */
+void op_pall(stack_t **stack, unsigned int line_number)
+{
+	stack_t *temp;
+	(void)line_number;
+	temp = *stack;
+	while (temp)
+	{
+		printf("%d\n", temp->n);
+		temp = temp->next;
+	}
+}
+
+/**
+ *op_pint -  prints the value at the top of the stack, followed by a new line
+ *@stack: pointer to the head node pointer
+ *@line_number: the line number
+ *Return: void
+ */
+void op_pint(stack_t **stack, unsigned int line_number)
+{
+	stack_t *temp;
+	(void)line_number;
+	if (*stack == NULL)
+	{
+		fprintf(stderr, "L%d: can't pint, stack empty\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+
+	temp = *stack;
+	printf("%d\n", temp->n);
 }
